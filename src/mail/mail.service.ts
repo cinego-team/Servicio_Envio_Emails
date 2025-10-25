@@ -22,23 +22,26 @@ export class MailService {
     async sendEmailBoleto(data: SendMailDTO) {
         const mailOptions = {
             from: this.configService.get('EMAIL_FROM'),
-            // to: data.destinatario,
             to: data.destinatario,
             subject: '¡Gracias por tu compra en CineGo!',
-            html: `
-        <h2>¡Gracias por tu compra!</h2>
-        <p>Adjuntamos tu código QR para el ingreso.</p>
-        <p>¡Disfrutá la función! 🍿</p>
-      `,
-            attachments: [
-                {
-                    filename: 'entrada_qr.png',
-                    content: data.qrBuffer,
-                    encoding: 'base64',
-                },
-            ],
-        };
-
+            html:
+                `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h2>¡Gracias por tu compra! 🍿</h2>
+                    <p><strong>Título:</strong> ${data.titulo}</p>
+                    <p><strong>Fecha:</strong> ${data.fecha}</p>
+                    <p><strong>Hora:</strong> ${data.hora}</p>
+                    <p>Adjuntamos tu código QR para ingresar a la función:</p>
+                    <div style="text-align:center; margin:20px 0;">
+                        <img src="${data.qr}" alt="Código QR de tu entrada" style="width:200px; height:200px;" />
+                    </div>
+                    <p>Mostralo en la entrada del cine para disfrutar de la película.</p>
+                    <p style="margin-top:30px;">¡Te esperamos! 🎥</p>
+                    <hr />
+                    <small style="color:#777;">CineGo! - Tu experiencia de cine, más fácil.</small>
+                </div>
+            `
+        }
         await this.transporter.sendMail(mailOptions);
     }
 }
