@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { SendMailDTO } from './dto/send-mail.dto';
+import { QrToBuffer } from 'src/services/qr.service';
 
 @Injectable()
 export class MailService {
@@ -20,6 +21,7 @@ export class MailService {
     }
 
     async sendEmailBoleto(data: SendMailDTO) {
+        const qrs: Buffer[] = await QrToBuffer(data.qrs);
         const mailOptions = {
             from: this.configService.get('EMAIL_FROM'),
             to: data.destinatario,
@@ -32,15 +34,19 @@ export class MailService {
                     <p><strong>Fecha:</strong> ${data.fecha}</p>
                     <p><strong>Hora:</strong> ${data.hora}</p>
                     <p>Adjuntamos tu código QR para ingresar a la función:</p>
-                    <div style="text-align:center; margin:20px 0;">
-                        <img src="${data.qr}" alt="Código QR de tu entrada" style="width:200px; height:200px;" />
-                    </div>
                     <p>Mostralo en la entrada del cine para disfrutar de la película.</p>
                     <p style="margin-top:30px;">¡Te esperamos! 🎥</p>
                     <hr />
-                    <small style="color:#777;">CineGo! - Tu experiencia de cine, más fácil.</small>
+                    <small style="color:#777;">CineGo - Tu experiencia de cine, más fácil.</small>
                 </div>
-            `
+            `,
+            attachments: [
+                qrs.map((qrBuffer, index) => ({
+                    filename: `boleto_${index + 1}.png`,
+                    content: qrBuffer,
+                    cid: 'qrimg'
+                })),
+            ]
         }
         await this.transporter.sendMail(mailOptions);
     }

@@ -3,5 +3,5 @@ export class SendMailDTO {
     fecha: string;
     hora: string;
     destinatario: string;
-    qr: string;
+    qrs: string[];
 }
