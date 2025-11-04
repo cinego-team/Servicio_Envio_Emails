@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '@nestjs/config';
 import { SendMailDTO } from './dto/send-mail.dto';
-import { QrToBuffer } from 'src/services/qr.service';
+import { generarQrsComoBuffers } from 'src/services/qr.service';
 
 @Injectable()
 export class MailService {
     private transporter;
 
-    constructor(private configService: ConfigService) {
+    constructor(
+        private configService: ConfigService,
+    ) {
         this.transporter = nodemailer.createTransport({
             host: this.configService.get('EMAIL_HOST'),
             port: this.configService.get('EMAIL_PORT'),
@@ -21,7 +23,7 @@ export class MailService {
     }
 
     async sendEmailBoleto(data: SendMailDTO) {
-        const qrs: Buffer[] = await QrToBuffer(data.qrs);
+        const qrs: Buffer[] = await generarQrsComoBuffers(data.qrs);
         const mailOptions = {
             from: this.configService.get('EMAIL_FROM'),
             to: data.destinatario,
@@ -40,13 +42,11 @@ export class MailService {
                     <small style="color:#777;">CineGo - Tu experiencia de cine, más fácil.</small>
                 </div>
             `,
-            attachments: [
+            attachments:
                 qrs.map((qrBuffer, index) => ({
-                    filename: `boleto_${index + 1}.png`,
+                    filename: `entrada_${index + 1}.png`,
                     content: qrBuffer,
-                    cid: 'qrimg'
                 })),
-            ]
         }
         await this.transporter.sendMail(mailOptions);
     }
