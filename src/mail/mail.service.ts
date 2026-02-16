@@ -12,12 +12,12 @@ export class MailService {
         private configService: ConfigService,
     ) {
         this.transporter = nodemailer.createTransport({
-            host: this.configService.get('EMAIL_HOST'),
-            port: this.configService.get('EMAIL_PORT'),
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
             secure: false,
             auth: {
-                user: this.configService.get('EMAIL_USER'),
-                pass: this.configService.get('EMAIL_PASS'),
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
             },
         });
     }
