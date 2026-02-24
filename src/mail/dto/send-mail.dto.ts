@@ -1,7 +1,9 @@
 export class SendMailDTO {
-    titulo: string;
-    fecha: string;
-    hora: string;
-    destinatario: string;
-    qrs: string[];
+    body: {
+        titulo: string;
+        fecha: string;
+        hora: string;
+        destinatario: string;
+        qrs: string[];
+    }
 }

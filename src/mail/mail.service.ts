@@ -12,29 +12,30 @@ export class MailService {
         private configService: ConfigService,
     ) {
         this.transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
-            port: process.env.EMAIL_PORT,
+            host: process.env.EMAIL_HOST || "smtp.gmail.com",
+            port: process.env.EMAIL_PORT || 587,
             secure: false,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: process.env.EMAIL_USER || "cinegoventas@gmail.com",
+                pass: process.env.EMAIL_PASS || "vtbc nftc atuq sozm",
             },
         });
     }
 
     async sendEmailBoleto(data: SendMailDTO) {
-        const qrs: Buffer[] = await generarQrsComoBuffers(data.qrs);
+        const qrs: Buffer[] = await generarQrsComoBuffers(data.body.qrs);
+        console.log(data)
         const mailOptions = {
             from: this.configService.get('EMAIL_FROM'),
-            to: data.destinatario,
+            to: data.body.destinatario,
             subject: '¡Gracias por tu compra en CineGo!',
             html:
                 `
                 <div style="font-family: Arial, sans-serif; color: #333;">
                     <h2>¡Gracias por tu compra! 🍿</h2>
-                    <p><strong>Título:</strong> ${data.titulo}</p>
-                    <p><strong>Fecha:</strong> ${data.fecha}</p>
-                    <p><strong>Hora:</strong> ${data.hora}</p>
+                    <p><strong>Título:</strong> ${data.body.titulo}</p>
+                    <p><strong>Fecha:</strong> ${data.body.fecha}</p>
+                    <p><strong>Hora:</strong> ${data.body.hora}</p>
                     <p>Adjuntamos tu código QR para ingresar a la función:</p>
                     <p>Mostralo en la entrada del cine para disfrutar de la película.</p>
                     <p style="margin-top:30px;">¡Te esperamos! 🎥</p>
